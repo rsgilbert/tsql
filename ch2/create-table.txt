@@ -1,0 +1,94 @@
+USE TSQL2012;
+
+IF OBJECT_ID('dbo.Employees', 'U') IS NOT NULL
+    DROP TABLE dbo.Employees;
+
+CREATE TABLE dbo.Employees 
+(
+    empid     INT         NOT NULL,
+    firstname VARCHAR(30) NOT NULL,
+    lastname  VARCHAR(30) NOT NULL,
+    hiredate  DATE        NOT NULL,
+    mgrid     INT         NULL,
+    ssn       VARCHAR(20) NOT NULL,
+    salary    MONEY       NOT NULL
+);
+
+// insert into Employees
+INSERT INTO [dbo].[Employees]
+( 
+ empid, firstname, lastname, hiredate, mgrid, ssn, salary
+)
+VALUES
+( 
+ 3, 'John', 'silver', '2022-02-22', 5, 'S11', 200
+);
+
+// Add primary key constraint on empid
+ALTER TABLE dbo.Employees 
+    ADD CONSTRAINT PK_Employees 
+    PRIMARY KEY(empid);
+
+// Add unique constraint
+ALTER TABLE dbo.Employees 
+    ADD CONSTRAINT UNQ_Employees_ssn 
+    UNIQUE(ssn);
+
+
+// create orders table 
+
+CREATE TABLE dbo.Orders 
+(
+    orderid   INT NOT NULL,
+    empid   INT NOT NULL,
+    custid VARCHAR(10) NOT NULL,
+    orderts DATETIME2 NOT NULL,
+    qty iNt NOT NULL,
+    CONSTRAINT PK_Orders 
+        PRIMARY KEY(orderid)
+);
+
+// add foreign key to restrict empid in Orders to values in empid column of Employee
+
+ALTER TABLE dbo.Orders 
+    ADD CONSTRAINT FK_Orders_Employees 
+    FOREIGN KEY(empid)
+    REFERENCES dbo.Employees(empid);
+
+// insert an order
+INSERT INTO dbo.Orders 
+(orderid, empid, custid, orderts, qty)
+VALUES (2, 2, 'C1', '2022-01-02', 3);
+
+// add a foreign key on mgrid 
+ALTER TABLE dbo.Employees 
+ADD CONSTRAINT FK_Employees_Employees 
+    FOREIGN KEY(mgrid) 
+    REFERENCES dbo.Employees(empid); 
+
+// delete a constraint
+ALTER TABLE [dbo].[Orders] DROP CONSTRAINT [FK_Orders_Employees]
+GO
+
+
+// add a foreign key constraint with on delete cascade 
+ALTER TABLE dbo.Orders
+    ADD CONSTRAINT FK_Orders_Employees2 
+        FOREIGN KEY(empid) 
+        REFERENCES dbo.Employees(empid)
+        ON DELETE CASCADE;
+
+// add a check constraint
+ALTER TABLE dbo.Employees 
+    ADD CONSTRAINT CHK_Employees_salary 
+    CHECK (salary > 0);
+
+// add a check constraint bypassing the check constraint on existing data
+ALTER TABLE dbo.Employees WITH NOCHECK
+    ADD CONSTRAINT CHK_Employees_salary
+    CHECK (salary > 0);
+
+// add default constraint 
+ALTER TABLE dbo.Employees 
+    ADD CONSTRAINT DFT_Employees_hiredate 
+    DEFAULT (SYSDATETIME()) FOR hiredate;

@@ -1,0 +1,9 @@
+// eliminates self pairs (1, 1) and  mirrored pairs ie (1,2) is included but (2, 1) is not  
+SELECT  
+    E1.empid, E2.firstname, E1.lastname, 
+    E2.empid, E2.firstname, E2.lastname 
+FROM HR.Employees AS E1 
+    INNER JOIN HR.Employees AS E2
+        ON E1.empid < E2.empid
+ORDER BY E1.empid DESC, E2.empid;
+

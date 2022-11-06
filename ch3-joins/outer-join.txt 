@@ -1,0 +1,40 @@
+// find customers who did not place any orders 
+SELECT C.custid, C.companyname, O.orderid 
+FROM Sales.Customers AS C 
+    LEFT OUTER JOIN Sales.Orders AS O 
+    ON C.custid = O.custid
+WHERE O.orderid IS NULL;     
+
+// find customers with given order date including those who have never ordered
+SELECT C.custid, C.companyname, O.orderid, O.orderdate 
+FROM Sales.Customers AS C 
+    LEFT OUTER JOIN Sales.Orders AS O 
+    ON C.custid = O.custid 
+WHERE O.orderdate = '20070101' OR O.custid IS NULL;
+
+// multi join showing customers without orders 
+SELECT C.custid, O.orderid, OD.productid, OD.qty 
+FROM Sales.Customers AS C 
+    LEFT OUTER JOIN Sales.Orders AS O
+    ON C.custid = O.custid 
+    LEFT OUTER JOIN Sales.OrderDetails AS OD 
+    ON O.orderid = OD.orderid 
+
+
+// alternatively for above query:
+SELECT C.custid, O.orderid, OD.productid, OD.qty  
+FROM Sales.Orders AS O 
+    INNER JOIN Sales.OrderDetails AS OD 
+    ON O.orderid = OD.orderid 
+    RIGHT OUTER JOIN Sales.Customers AS C 
+    ON C.custid = O.custid 
+
+// Count orders per customer 
+// customers with no orders should have an order count of 0 
+SELECT C.custid, COUNT(O.orderid) AS numorders 
+FROM Sales.Customers AS C 
+    LEFT OUTER JOIN Sales.Orders AS O 
+    ON C.custid = O.custid
+WHERE C.custid >= 20 
+GROUP BY C.custid
+

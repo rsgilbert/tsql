@@ -1,0 +1,101 @@
+// five copies of each employee 
+// qtn 1-1
+// Write a query that generates five copies of each employee row.
+SELECT empid, firstname, lastname, n
+FROM HR.Employees
+    CROSS JOIN Nums 
+WHERE n < 6;
+
+// qtn 1-2 
+// Write a query that returns a row for each employee and day in the range June 12, 2009 through June 16, 2009. 
+SELECT empid, DATEADD(day, n-1, '20090612') 
+FROM Nums CROSS JOIN HR.Employees
+WHERE n BETWEEN 1 AND 5
+ORDER BY empid;
+
+
+// qtn 2 
+// Return United States customers, and for each customer return the total number of orders and total quantities.
+SELECT C.custid, COUNT(O.orderid) AS numorders, SUM(OD.qty) AS totalqty
+FROM Sales.Customers AS C
+    LEFT OUTER JOIN Sales.Orders AS O   
+    ON C.custid = O.custid
+    LEFT OUTER JOIN Sales.OrderDetails AS OD 
+    ON O.orderid = OD.orderid 
+WHERE country = 'USA'
+GROUP BY C.custid
+
+// qtn 3 
+// Return customers and their orders, including customers who placed no orders.
+SELECT C.custid, C.companyname, O.orderid, O.orderdate 
+FROM Sales.Customers AS C
+    LEFT OUTER JOIN Sales.Orders AS O   
+    ON C.custid = O.custid
+
+
+// qtn 4 
+// Return customers who placed no orders.
+SELECT C.custid, C.companyname
+FROM Sales.Customers AS C
+    LEFT OUTER JOIN Sales.Orders AS O   
+    ON C.custid = O.custid
+WHERE O.orderid IS NULL 
+
+
+// qtn 5 
+// Return customers with orders placed on February 12, 2007, along with their orders.
+SELECT C.custid, C.companyname, O.orderid, O.orderdate 
+FROM Sales.Customers AS C
+    LEFT OUTER JOIN Sales.Orders AS O   
+    ON C.custid = O.custid  
+WHERE O.orderdate = '20070212'
+
+
+// qtn 6 
+// Return customers with orders placed on February 12, 2007, along with their orders. Also return cus- tomers who didn’t place orders on February 12, 2007.
+SELECT C1.custid, C1.companyname, O.orderid, O.orderdate 
+FROM Sales.Customers AS C1
+    LEFT OUTER JOIN Sales.Orders AS O   
+    ON C1.custid = O.custid 
+    RIGHT OUTER JOIN Sales.Customers AS C2 
+    ON C1.custid = C2.custid AND O.orderdate = '20070212'
+
+// alternatively:
+SELECT C2.custid, C2.companyname, Out1.orderid, Out1.orderdate  
+FROM (
+    SELECT C1.custid, C1.companyname, O.orderid, O.orderdate 
+    FROM Sales.Customers AS C1
+        LEFT OUTER JOIN Sales.Orders AS O   
+        ON C1.custid = O.custid 
+    WHERE O.orderdate = '20070212'
+    ) AS Out1
+    RIGHT OUTER JOIN Sales.Customers AS C2 
+    ON Out1.custid = C2.custid 
+
+// qtn 7 
+SELECT C1.custid, C1.companyname, 
+    CASE WHEN O.orderid IS NOT NULL THEN 'Yes' ELSE 'No' END AS 'HasOrderOn20070212'
+FROM Sales.Customers AS C1
+    LEFT OUTER JOIN Sales.Orders AS O   
+    ON C1.custid = O.custid 
+    RIGHT OUTER JOIN Sales.Customers AS C2 
+    ON C1.custid = C2.custid AND O.orderdate = '20070212';
+
+// book answer for qtn 7 
+SELECT C1.custid, C1.companyname, 
+    CASE WHEN O.orderid IS NOT NULL THEN 'Yes' ELSE 'No' END AS 'HasOrderOn20070212'
+FROM Sales.Customers AS C1
+    LEFT OUTER JOIN Sales.Orders AS O   
+    ON C1.custid = O.custid AND O.orderdate = '20070212'
+
+
+
+passion christian high school, kyebando - milcah s6
+
+
+
+
+
+
+
+

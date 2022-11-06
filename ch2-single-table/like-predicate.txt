@@ -1,0 +1,37 @@
+// %
+SELECT empid, lastname 
+FROM HR.Employees
+WHERE lastname LIKE 'D%';
+
+// above equivalent to 
+SELECT empid, lastname 
+FROM HR.Employees
+WHERE SUBSTRING(lastname, 1, 1) = 'D' ;
+
+
+// _
+SELECT empid, lastname 
+FROM HR.Employees
+WHERE lastname LIKE '_e%';
+
+// []
+SELECT empid, lastname, firstname
+FROM HR.Employees
+WHERE firstname LIKE '[DJ]%';
+
+SELECT empid, lastname, firstname
+FROM HR.Employees
+WHERE firstname LIKE '[A-P]%';
+
+SELECT empid, lastname, firstname
+FROM HR.Employees
+WHERE firstname LIKE '[^A-P]%';
+
+// ESCAPE 
+SELECT empid, firstname, title
+FROM HR.Employees
+WHERE firstname LIKE '%!_' ESCAPE '!';
+
+
+
+

@@ -1,0 +1,20 @@
+// group orders 
+USE TSQL2012;
+
+SELECT empid, YEAR(orderdate) AS orderyear, COUNT(*) AS Count, MAX(freight) AS maxfreight, MIN(freight) AS minfreight, AVG(freight) AS AverageFreight, SUM(freight) AS TotalFreight
+FROM Sales.Orders
+WHERE custid = 71
+GROUP BY empid, YEAR(orderdate);
+
+
+// distinct customers handled by an
+// employee in each year
+SELECT empid, YEAR(orderdate) AS 'Year', COUNT(DISTINCT custid) AS 'Customers Handled'
+FROM Sales.Orders
+GROUP BY empid, YEAR(orderdate);
+
+// See only those rows where the customers handled > 20
+SELECT empid, YEAR(orderdate) AS 'Year', COUNT(DISTINCT custid) AS 'Customers Handled'
+FROM Sales.Orders
+GROUP BY empid, YEAR(orderdate)
+HAVING COUNT(DISTINCT custid) > 20;

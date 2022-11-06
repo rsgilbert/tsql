@@ -1,0 +1,7 @@
+// multi join query 
+// join multiple tables 
+SELECT 
+    C.custid, C.companyname, O.orderid, OD.productid, OD.qty 
+FROM Sales.Customers AS C 
+    INNER JOIN Sales.Orders AS O ON O.custid = C.custid 
+    INNER JOIN Sales.OrderDetails AS OD ON O.orderid = OD.orderid;

@@ -1,0 +1,22 @@
+// A scalar subquery is a subquery that returns a single value in a singe column.
+USE TSQL2012;
+
+DECLARE @maxid AS INT = (SELECT MAX(orderid) FROM Sales.Orders);
+
+SELECT @maxid;
+
+
+SELECT orderid, orderdate, empid, custid 
+FROM Sales.Orders 
+WHERE orderid = @maxid;
+
+
+
+SELECT orderid, orderdate, empid, custid 
+FROM Sales.Orders 
+WHERE orderid = (SELECT MAX(orderid) FROM Sales.Orders);
+
+// if a scalar subquery returns no value, it returns a NULL 
+SELECT orderid, empid 
+FROM Sales.Orders 
+WHERE (SELECT E.empid FROM HR.Employees AS E WHERE E.lastname LIKE '%Bdv%') IS NULL ;

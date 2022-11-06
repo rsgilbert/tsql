@@ -1,0 +1,29 @@
+// cross join
+SELECT E.empid, O.orderid 
+FROM HR.Employees AS E, Sales.Orders AS O;
+
+
+// inner join 
+SELECT E.empId, E.firstName, O.empid AS 'Order Empid', O.orderid 
+FROM HR.Employees AS E, Sales.Orders AS O 
+WHERE E.empid = O.empid 
+ORDER BY O.orderid;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

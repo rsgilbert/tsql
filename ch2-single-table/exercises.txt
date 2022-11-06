@@ -1,0 +1,90 @@
+//1
+// orders placed in June 2007.
+
+SELECT orderid, orderdate, custid, empid 
+FROM Sales.Orders 
+WHERE (orderdate >= '20070601') AND orderdate < '20070701';
+
+
+// or 
+
+SELECT orderid, orderdate, custid, empid 
+FROM Sales.Orders 
+WHERE (orderdate >= CAST('2007-06-01' AS DATETIME2)) AND orderdate < CAST('2007-07-01' AS DATETIME2); 
+
+
+// or 
+SELECT orderid, orderdate, custid, empid 
+FROM Sales.Orders 
+WHERE YEAR(orderdate) = 2007 AND MONTH(orderdate) = 6;
+
+
+
+//2. 
+// orders placed on the last day of the month.
+
+SELECT orderid, orderdate, custid, empid 
+FROM Sales.Orders 
+WHERE orderdate = EOMONTH(orderdate);
+
+
+
+// 3
+// employees with last name containing the letter a twice or more.
+
+SELECT empid, firstname, lastname 
+FROM HR.Employees 
+WHERE lastname LIKE '%a%a%';
+
+// 4.
+// orders with total value (quantity * unit- price) greater than 10,000, sorted by total value.
+
+SELECT orderid, SUM(qty * unitprice)
+FROM Sales.OrderDetails 
+GROUP BY orderid
+HAVING SUM(qty * unitprice)  > 10000
+ORDER BY SUM(qty * unitprice) DESC;
+
+
+
+// 5 
+// three shipped-to countries with the high- est average freight in 2007.
+SELECT shipcountry, AVG(freight) AS avgfreight
+FROM Sales.Orders
+WHERE YEAR(orderdate) = 2007
+GROUP BY shipcountry
+ORDER BY AVG(freight) DESC
+OFFSET 0 ROWS FETCH FIRST 3 ROWS ONLY;
+
+
+// 6. 
+//  row numbers for orders based on order date ordering (using the order ID as the tiebreaker) for each customer separately.
+SELECT custid, orderdate, orderid, ROW_NUMBER() OVER (PARTITION BY custid ORDER BY orderdate)
+FROM Sales.Orders
+ORDER BY custid 
+
+
+// 7. 
+// returns for each employee the gender based on the title of courtesy. For ‘Ms. ‘ and ‘Mrs.’ return ‘Female’; for ‘Mr. ‘ return ‘Male’; and in all other cases (for example, ‘Dr. ‘) return ‘Unknown’.
+SELECT empid, firstname, lastname, titleofcourtesy,
+    CASE titleofcourtesy
+        WHEN 'Ms.' THEN 'Female'
+        WHEN 'Mrs.' THEN 'Female'
+        WHEN 'Mr.' THEN 'Male'
+        ELSE 'Unknown'
+    END AS gender
+FROM HR.Employees ;
+
+// 8 
+// or each customer the customer ID and region. Sort the rows in the output by region, having NULL marks sort last (after non-NULL values).
+SELECT custid, region
+FROM Sales.Customers  
+ORDER BY CASE 
+    WHEN region IS NULL THEN 1
+    ELSE 0 
+END, region;
+
+
+
+
+

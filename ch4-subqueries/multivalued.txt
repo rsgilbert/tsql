@@ -1,0 +1,46 @@
+A multivalued subquery is a subquery that returns 
+multiple values as a single column. 
+
+// return orders placed by employees whose lastname start with D 
+SELECT orderid, empid 
+FROM Sales.Orders 
+WHERE empid IN (SELECT E.empid FROM HR.Employees AS E WHERE E.lastname LIKE '%D%')
+ORDER BY empid DESC ;
+
+// orders by USA employees 
+SELECT orderid, empid 
+FROM Sales.Orders 
+WHERE empid IN (SELECT E.empid FROM HR.Employees AS E WHERE E.country = 'USA')
+ORDER BY empid DESC ;
+
+// Customers who did not place any orders 
+SELECT * 
+FROM Sales.Customers 
+WHERE custid NOT IN (SELECT custid FROM Sales.Orders);
+
+
+// preparation 
+CREATE TABLE dbo.Orders(orderid INT NOT NULL CONSTRAINT PK_Orders PRIMARY KEY);
+
+INSERT INTO dbo.Orders (orderid) 
+    SELECT orderid 
+    FROM Sales.Orders 
+    WHERE orderid % 2 = 0;
+
+SELECT * FROM dbo.Orders;
+
+// select missing orders 
+SELECT n 
+FROM dbo.Nums 
+WHERE 
+    n NOT IN (SELECT * FROM dbo.Orders)
+    AND 
+    n BETWEEN 
+        (SELECT MIN(orderid) FROM dbo.Orders)
+        AND 
+        (SELECT MAX(orderid) FROM dbo.Orders)
+
+
+
+
+

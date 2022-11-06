@@ -1,0 +1,67 @@
+SELECT orderid, custid, empid, orderdate 
+FROM Sales.Orders 
+WHERE orderdate = CAST('20070212' AS DATETIME2);
+
+SELECT CAST('5/7/2020' AS DATETIME2(5));
+
+
+// LANGUAGE
+SELECT CAST('2/6/2021' AS DATETIME2(5))
+
+SET LANGUAGE British;
+SELECT CAST('4/10/2020' AS DATETIME2);
+
+SET LANGUAGE us_english;
+SELECT CAST('12/3/2015' AS DATETIME); 
+
+
+
+// CONVERT 
+SET LANGUAGE British;
+SELECT CONVERT(DATETIME, '1/15/2007', 101) AS 'mm/dd/yyyy';
+SET LANGUAGE us_english;
+SELECT CONVERT(DATETIME, '4/25/2007', 101) AS 'mm/dd/yyyy';
+
+SET LANGUAGE British;
+SELECT CONVERT(DATETIME, '20/3/2007', 103) AS 'dd/mm/yyyy';
+
+// PARSE 
+SELECT PARSE('03/15/2008' AS DATETIME2 USING 'en-US') AS 'en-US';
+SELECT PARSE('23/5/2008' AS DATETIME2 USING 'en-GB') AS 'en-GB';
+
+
+
+// handle extra time component
+SELECT orderid, custid, empid, orderdate 
+FROM SAles.Orders 
+WHERE orderdate >= '20070212' AND orderdate < '20070213';
+
+// time only
+SELECT CAST('12:1:15' AS DATETIME2);
+
+
+// filter date ranges
+SELECT orderid, custid, empid, orderdate 
+FROM SAles.Orders 
+WHERE YEAR(orderdate) = 2006;
+
+// more efficient than above 
+SELECT orderid, custid, empid, orderdate 
+FROM SAles.Orders 
+WHERE orderdate >= '2006-01-01' AND orderdate < '2007-01-01';
+
+// date functions 
+// CURRENT_TIMESTAMP, GETDATE()
+SELECT GETDATE() AS 'GETDATE', CURRENT_TIMESTAMP  AS 'CURRENT_TIMESTAMP';
+SELECT CAST(CURRENT_TIMESTAMP AS DATE);
+
+
+// DATEDIFF
+SELECT DATEDIFF (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+
+
+
+
+
+
+

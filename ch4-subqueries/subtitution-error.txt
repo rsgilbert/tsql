@@ -1,0 +1,25 @@
+// create sample table 
+CREATE TABLE Sales.MyShippers 
+(
+    shipper_id INT NOT NULL,
+    companyname NVARCHAR(40) NOT NULL,
+    phone NVARCHAR(24) NOT NULL,
+    CONSTRAINT PK_MyShippers PRIMARY KEY(shipper_id) 
+);
+
+INSERT INTO Sales.MyShippers(shipper_id, companyname, phone)
+VALUES (1, 'Shipper GVSUA', '007123'),
+    (2, 'Shipper NTYNR', '001234'),
+    (3, 'Shipper ZHISN', '65432'); 
+
+
+
+
+// best practice 
+// prefix column names in subqueries with source table alias 
+SELECT shipper_id, companyname
+FROM Sales.MyShippers
+WHERE shipper_id IN (SELECT O.shipperid FROM Sales.Orders AS O WHERE custid = 43);
+
+
+

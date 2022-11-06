@@ -1,0 +1,15 @@
+USE TSQL2012;
+
+SELECT empid, YEAR(orderdate) AS orderyear, COUNT(*) AS numorders 
+FROM Sales.Orders 
+WHERE custid = 71 
+GROUP BY empid, YEAR(orderdate)
+HAVING COUNT(*) > 1
+ORDER BY empid, orderyear;
+
+
+// make a case-sensitive filter
+// Change collation of an expression
+SELECT empid, firstname, lastname 
+FROM HR.Employees 
+WHERE lastname COLLATE Latin1_General_CS_AS = 'Davis';

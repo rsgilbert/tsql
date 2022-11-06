@@ -1,0 +1,108 @@
+// concatenate
+SELECT empid, firstname + ' ' + lastname AS fullname 
+FROM HR.Employees;
+
+// concatenate while  replacing null 
+SELECT custid, country, region, city, country + COALESCE(','+region+',', ',') + city AS location
+FROM Sales.Customers;
+
+// use CONCAT 
+SELECT custid, country, region, city, CONCAT(country, ',', region, ',', city) AS location
+FROM Sales.Customers;
+
+
+// SUBSTRING 
+SELECT SUBSTRING('green battery', 2, 5);
+
+SELECT empid, SUBSTRING(lastname, 1, 1) + SUBSTRING(firstname, 1, 1) AS 'Initials', title
+FROM HR.Employees;
+
+// LEFT and RIGHT
+SELECT empid, LEFT(lastname, 1), LEFT(lastname, 2), LEFT(lastname, 3), LEFT(lastname, 4), RIGHT(lastname, 10)
+FROM HR.Employees;
+
+
+// LEN - number of characters 
+SELECT empid, lastname, LEN(lastname) AS 'Last name length'
+FROM HR.Employees;
+
+// DATALENGTH - Number of bytes
+SELECT 'able', LEN('able') AS Length, DATALENGTH('able') AS Datalength;
+SELECT N'able', LEN(N'able') AS Length, DATALENGTH(N'able') AS Datalength;
+
+SELECT empid, lastname, DATALENGTH(lastname) AS 'No of bytes'
+FROM HR.Employees;
+
+// charindex 
+SELECT 'garment', CHARINDEX('m', 'garment') AS 'Position of m in garment';
+
+SELECT lastname, title, 
+    SUBSTRING(title, 0, CHARINDEX(' ', title)) AS 'title start', 
+    SUBSTRING(title, CHARINDEX(' ', title) + 1, LEN(title)) AS 'title end' 
+FROM HR.Employees;
+
+// PATINDEX
+SELECT PATINDEX('%[0-9]%', 'abcde6g');
+
+// REPLACE
+SELECT lastname, titleofcourtesy, REPLACE(titleofcourtesy, '.', '_')
+FROM HR.Employees;
+
+SELECT REPLACE(CAST('mine' AS CHAR(10)) + 'today', ' ', '*');
+
+// REPLICATE
+SELECT lastname, REPLICATE('*', LEN(Lastname)) AS 'Last Name Hidden'
+FROM HR.Employees;
+
+// generate nos using REPLICATE 
+SELECT supplierid, 'S' + RIGHT(REPLICATE('0', 4) + CAST(supplierid AS VARCHAR(4)), 4) AS 'No.'
+FROM Production.Suppliers;
+
+// or like so 
+SELECT supplierid, CONCAT('S', RIGHT(CONCAT(REPLICATE('0', 4), supplierid), 4)) AS 'No.'
+FROM Production.Suppliers;
+
+// STUFF 
+SELECT STUFF('gilbert', 2, 3, 'bazooka');
+
+// UPPER, LOWER 
+SELECT lastname, LOWER(firstname), UPPER(titleofcourtesy)
+FROM HR.Employees;
+
+// LTRIM, RTRIM 
+SELECT RTRIM('   abcde   ');
+SELECT LTRIM('   xyz    ');
+
+// FORMAT
+SELECT FORMAT(15, '0000');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,26 @@
+// find out how many days are in between 
+-- SELECT DATEDIFF(day, '2006-01-01', '2008-12-31');
+-- 1095 
+
+// first show only dates  
+SELECT CAST(DATEADD(day, n-1, '2006-01-01') AS DATE)
+FROM dbo.Nums 
+WHERE n < 1097
+ORDER BY n DESC; 
+
+// now dates with orderid 
+SELECT CAST(DATEADD(day, n-1, '2006-01-01') AS DATE) AS 'Date', O.orderdate, O.orderid
+FROM dbo.Nums 
+    LEFT OUTER JOIN Sales.Orders AS O 
+        ON DATEADD(day, n-1, '2006-01-01') = O.orderdate
+WHERE n < 1097 
+ORDER BY n ASC;
+
+// final query 
+SELECT CAST(DATEADD(day, n-1, '2006-01-01') AS DATE) AS 'Date', O.orderid
+FROM dbo.Nums 
+    LEFT OUTER JOIN Sales.Orders AS O 
+        ON DATEADD(day, n-1, '2006-01-01') = O.orderdate
+WHERE n < DATEDIFF(day, '2006-01-01', '2008-12-31') + 2
+ORDER BY n DESC;
+

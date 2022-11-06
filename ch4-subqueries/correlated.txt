@@ -1,0 +1,83 @@
+Correlated subqueries are subqueries that refer to attributes 
+from the table that appears in the outer query.
+
+// select orders with maximum orderid for the customer. 
+// In otherwords, the newest orders per customer 
+SELECT custid, orderid, orderdate, empid 
+FROM Sales.Orders AS O1 
+    WHERE orderid = 
+        (
+        SELECT MAX(O2.orderid)
+        FROM Sales.Orders AS O2 
+        WHERE O2.custid = O1.custid
+        );
+
+// above query is equivalent to :
+SELECT custid, MAX(orderid) 
+FROM Sales.Orders AS O 
+GROUP BY custid
+ORDER BY custid DESC; 
+
+
+// select percentage value of order out of total values for all customer's orders 
+SELECT custid, orderid, CAST(100 * OV1.val / (
+                                    SELECT SUM(OV2.val) 
+                                    FROM Sales.OrderValues AS OV2 
+                                    WHERE OV2.custid = OV1.custid
+                                    ) AS NUMERIC(5,2)) AS perc
+FROM SALES.OrderValues AS OV1
+ORDER BY custid, orderid; 
+
+// select customers from spain who placed orders 
+SELECT * 
+FROM Sales.Customers AS C
+WHERE country = 'Spain' 
+    AND EXISTS (SELECT * 
+                FROM Sales.Orders 
+                WHERE custid = C.custid); 
+
+
+// previous orderid 
+SELECT orderid, custid, (SELECT MAX(orderid) 
+                        FROM Sales.Orders AS O2
+                        WHERE O2.orderid < O1.orderid) AS prevorderid
+FROM Sales.Orders AS O1; 
+
+// next and previous 
+SELECT orderid, custid, (SELECT MAX(orderid) 
+                        FROM Sales.Orders AS O2
+                        WHERE O2.orderid < O1.orderid) AS prevorderid,
+                        (SELECT MIN(orderid)
+                        FROM Sales.Orders AS O2 
+                        WHERE O2.orderid > O1.orderid) AS nextorderid
+FROM Sales.Orders AS O1 
+ORDER BY O1.orderid ASC;
+
+
+// running aggregate 
+SELECT OT.orderyear, OT.qty, (SELECT SUM(qty) 
+                            FROM Sales.OrderTotalsByYear
+                            WHERE orderyear <= OT.orderyear) AS runningaggregate
+FROM Sales.OrderTotalsByYear AS OT
+ORDER BY OT.orderyear; 
+
+
+// avoid null trouble 
+SELECT custid, companyname 
+FROM Sales.Customers 
+WHERE custid NOT IN (SELECT O.custid FROM Sales.Orders AS O WHERE NOT O.custid IS NULL);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

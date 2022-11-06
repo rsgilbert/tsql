@@ -1,0 +1,34 @@
+
+CREATE TABLE Sales.OrderDetailsAudit 
+(
+    lsn INT NOT NULL IDENTITY,
+    orderid INT NOT NULL,
+    productid INT NOT NULL,
+    dt DATETIME NOT NULL,
+    loginname sysname NOT NULL,
+    columnname sysname NOT NULL,
+    oldval SQL_VARIANT,
+    newval SQL_VARIANT,
+    CONSTRAINT PK_OrderDetailsAudit PRIMARY KEY(lsn),
+    CONSTRAINT FK_OrderDetailsAudit_OrderDetails 
+        FOREIGN KEY(orderid, productid) 
+        REFERENCES Sales.OrderDetails(orderid, productid)
+);
+
+INSERT INTO Sales.OrderDetailsAudit 
+(orderid, productid, dt, loginname, columnname, oldval, newval)
+VALUES(10248, 11, CURRENT_TIMESTAMP, 'gilbert', 'unitprice', 100, 14);
+
+INSERT INTO Sales.OrderDetailsAudit 
+(orderid, productid, dt, loginname, columnname, oldval, newval)
+VALUES(10250, 51, CURRENT_TIMESTAMP, 'gilbert', 'qty', 23, 35);
+
+
+// query for data 
+// Use a composite join 
+SELECT SODA.orderid, SODA.productid, SODA.columnname, SODA.oldval, SODA.newval, SOD.qty
+FROM Sales.OrderDetailsAudit AS SODA INNER JOIN Sales.OrderDetails AS SOD 
+    ON SODA.orderid = SOD.orderid AND SODA.productid = SOD.productid
+WHERE SODA.columnname = 'qty';
+
+

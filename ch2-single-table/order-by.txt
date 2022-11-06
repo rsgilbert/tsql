@@ -1,0 +1,44 @@
+// select top 6 orderdates  from highest to lowest 
+SELECT TOP(5)  orderdate
+FROM Sales.Orders 
+ORDER BY orderdate DESC;
+
+// select top 1% orders 
+// TOP is not a standard SQL feature
+SELECT TOP(1) PERCENT orderid, orderdate, custid, empid
+FROM Sales.Orders 
+ORDER BY orderdate DESC;
+
+
+
+// use custid AS a tie breaker 
+SELECT TOP(1) PERCENT orderid, orderdate, custid, empid
+FROM Sales.Orders 
+ORDER BY orderdate DESC, custid DESC;
+
+// return all ties
+SELECT TOP(1) WITH TIES orderid, orderdate, custid, empid
+FROM Sales.Orders 
+ORDER BY orderdate DESC;
+
+// offset-fetch 
+// start from a particular point in the rows 
+// offset-fetch is a standard SQL feature 
+SELECT  orderid, orderdate, custid, empid
+FROM Sales.Orders 
+ORDER BY orderdate 
+OFFSET 2 ROWS FETCH NEXT 3 ROWS ONLY;
+
+
+SELECT  orderid, orderdate, custid, empid
+FROM Sales.Orders 
+ORDER BY orderdate 
+OFFSET 1 ROW FETCH FIRST 3 ROW ONLY;
+
+// window function 
+// show row number for each customer 
+SELECT orderid, custid, val,
+ROW_NUMBER() OVER (PARTITION BY custid ORDER BY val) AS rownum
+FROM Sales.OrderValues
+ORDER BY custid, val;
+

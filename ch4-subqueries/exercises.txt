@@ -1,0 +1,127 @@
+// 1 
+// Write a query that returns all orders placed on the last day of activity that can be found in the Orders table.
+
+SELECT orderid, orderdate, custid, empid 
+FROM Sales.Orders 
+WHERE orderdate = (
+    SELECT orderdate
+    FROM Sales.Orders 
+    ORDER BY orderdate DESC 
+    OFFSET 0 ROWS FETCH FIRST 1 ROW ONLY
+    );
+
+
+2 
+Write a query that returns all orders placed by the customer(s) who placed the highest number of orders. Note that more than one customer might have the same number of orders.
+
+
+SELECT orderid, orderdate, custid, empid 
+FROM Sales.Orders AS O1
+WHERE 
+    -- count of all orders by this customer
+    (SELECT COUNT(O2.orderid) 
+    FROM Sales.Orders AS O2
+    WHERE O2.custid = O1.custid) 
+    = 
+    -- max no of orders by a customer
+    (SELECT COUNT(O3.orderid)
+    FROM Sales.Orders AS O3
+    GROUP BY O3.custid
+    ORDER BY COUNT(O3.orderid) DESC
+    OFFSET 0 ROWS FETCH FIRST 1 ROW ONLY);
+
+
+
+3
+Write a query that returns employees who did not place orders on or after May 1, 2008.
+
+SELECT empid, firstname AS 'FirstName', lastname 
+FROM HR.Employees 
+WHERE empid NOT IN (
+    SELECT O.empid 
+    FROM Sales.Orders AS O
+    WHERE orderdate >= '20080501'
+);
+
+
+4
+Write a query that returns countries where there are customers but not employees.
+
+SELECT DISTINCT country
+FROM Sales.Customers
+WHERE country NOT IN 
+(
+    SELECT country FROM HR.Employees
+);
+
+
+5
+Write a query that returns for each customer all orders placed on the customer’s last day of activity.
+
+SELECT custid, orderid, orderdate, empid 
+FROM Sales.Orders AS OuterOrder
+WHERE orderdate = 
+    (
+        SELECT MAX(orderdate)
+        FROM Sales.Orders AS InnerOrder
+        WHERE InnerOrder.custid = OuterOrder.custid 
+    )
+ORDER BY OuterOrder.custid; 
+
+
+
+6
+Write a query that returns customers who placed orders in 2007 but not in 2008.
+
+SELECT custid, companyname 
+FROM Sales.Customers AS C 
+WHERE 
+    EXISTS (
+        SELECT * 
+        FROM Sales.Orders AS O
+        WHERE YEAR(O.orderdate) = 2007 AND O.custid = C.custid
+    )
+    AND NOT EXISTS(
+        SELECT * 
+        FROM Sales.Orders AS O 
+        WHERE YEAR(O.orderdate) = 2008 AND O.custid = C.custid 
+    )
+
+
+7 (Optional, advanced)
+Write a query that returns customers who ordered product 12.
+
+SELECT custid, companyname 
+FROM Sales.Customers AS SC 
+WHERE EXISTS (
+    SELECT *
+    FROM Sales.Orders AS SO
+    WHERE SO.custid = SC.custid 
+    AND EXISTS (
+        SELECT *
+        FROM Sales.OrderDetails AS SOD
+        WHERE SOD.productid = 12
+        AND SOD.orderid = SO.orderid
+    )
+);
+
+
+
+
+
+8 (Optional, advanced)
+Write a query that calculates a running-total quantity for each customer and month.
+
+SELECT custid, ordermonth, qty, 
+    (
+        SELECT SUM(InnerCO.qty) 
+        FROM Sales.CustOrders AS InnerCO
+        WHERE InnerCO.custid = OuterCO.custid 
+        AND InnerCO.ordermonth <= OuterCO.ordermonth
+    ) AS runqty
+FROM Sales.CustOrders AS OuterCO
+ORDER BY OuterCO.custid;
+
+
+
+

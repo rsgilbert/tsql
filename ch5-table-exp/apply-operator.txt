@@ -1,0 +1,59 @@
+// cross apply 
+SELECT C.custid, A.orderid, A.orderdate 
+FROM Sales.Customers AS C 
+    CROSS APPLY 
+        (SELECT orderid, orderdate
+        FROM Sales.Orders AS O 
+        WHERE O.custid = C.custid 
+        ORDER BY orderdate DESC, orderid DESC
+        OFFSET 0 ROWS FETCH FIRST 3 ROWS ONLY
+        ) AS A 
+        
+
+// outer apply 
+SELECT C.custid, A.orderid, A.orderdate 
+FROM Sales.Customers AS C 
+    OUTER APPLY 
+        (SELECT orderid, orderdate
+        FROM Sales.Orders AS O 
+        WHERE O.custid = C.custid 
+        ORDER BY orderdate DESC, orderid DESC
+        OFFSET 0 ROWS FETCH FIRST 3 ROWS ONLY
+        ) AS A ;
+
+// use tvf with outer apply
+// dont execute both the create function and select queries at the same time 
+CREATE FUNCTION dbo.GetTopThreeOrders(@custid AS INT)
+RETURNS TABLE 
+AS 
+RETURN 
+    SELECT @custid AS 'custid', orderid, orderdate
+    FROM Sales.Orders AS O 
+    WHERE O.custid = @custid
+    ORDER BY orderdate DESC, orderid DESC
+    OFFSET 0 ROWS FETCH FIRST 3 ROWS ONLY;
+
+SELECT *
+FROM Sales.Customers AS C 
+    OUTER APPLY 
+        dbo.GetTopThreeOrders(C.custid)  
+
+
+// one script that has the function definition and its usage
+// just for syntax
+IF OBJECT_ID('dbo.MaxOrderDate') IS NOT NULL
+    DROP FUNCTION dbo.MaxOrderDate;
+GO
+CREATE FUNCTION dbo.MaxOrderDate(@empid AS INT) 
+RETURNS TABLE 
+AS 
+RETURN 
+    SELECT MAX(orderdate) AS maxorderdate  
+    FROM Sales.Orders AS SO  
+    WHERE SO.empid = @empid
+GO 
+SELECT O.empid, M.maxorderdate 
+FROM Sales.Orders AS O 
+    CROSS APPLY dbo.MaxOrderDate(O.empid) AS M;
+
+

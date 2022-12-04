@@ -65,3 +65,25 @@ SELECT empid, mgrid, firstname, lastname
 FROM EmpsCTE
 ORDER BY empid;
 
+
+
+// select someone's juniors / subordinates. 
+WITH EmpsCTE AS 
+(
+    -- anchor member 
+    SELECT empid, mgrid, firstname, lastname 
+    FROM HR.Employees 
+    WHERE empid = 2 
+
+    UNION ALL 
+
+    -- recursive member
+    SELECT C.empid, C.mgrid, C.firstname, C.lastname 
+    FROM EmpsCTE AS P 
+        JOIN HR.Employees AS C 
+        ON C.mgrid = P.empid 
+)
+
+SELECT empid, mgrid, firstname, lastname 
+FROM EmpsCTE;
+

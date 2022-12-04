@@ -5,3 +5,6 @@ SELECT
 FROM Sales.Customers AS C 
     INNER JOIN Sales.Orders AS O ON O.custid = C.custid 
     INNER JOIN Sales.OrderDetails AS OD ON O.orderid = OD.orderid;
+
+
+

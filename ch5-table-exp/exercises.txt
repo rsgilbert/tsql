@@ -1,0 +1,117 @@
+1-1
+Write a query that returns the maximum value in the orderdate column for each employee.
+SELECT empid, MAX(orderdate) 
+FROM Sales.Orders 
+GROUP BY empid;
+
+
+1-2
+Encapsulate the query from Exercise 1-1 in a derived table. Write a join query between the derived table and the Orders table to return the orders with the maximum order date for each employee.
+SELECT O.empid, O.orderdate, O.orderid, O.custid 
+    FROM Sales.Orders AS O
+    INNER JOIN 
+        (SELECT empid, MAX(orderdate) AS maxorderdate 
+        FROM Sales.Orders 
+        GROUP BY empid) AS M
+    ON O.empid = M.empid AND O.orderdate = M.maxorderdate;
+
+
+
+2-1
+Write a query that calculates a row number for each order based on orderdate, orderid ordering.
+SELECT O.orderid, O.orderdate, O.custid, O.empid,
+    ROW_NUMBER() OVER (ORDER BY orderdate, orderid) AS rownum
+FROM Sales.Orders AS O ;
+
+
+2-2
+Write a query that returns rows with row numbers 11 through 20 based on the row number definition
+in Exercise 2-1. Use a CTE to encapsulate the code from Exercise 2-1.
+WITH AllRows AS 
+(
+SELECT O.orderid, O.orderdate, O.custid, O.empid,
+    ROW_NUMBER() OVER (ORDER BY orderdate, orderid) AS rownum
+FROM Sales.Orders AS O 
+)
+SELECT * 
+FROM AllRows
+ORDER BY orderid
+OFFSET 10 ROWS FETCH NEXT 10 ROWS ONLY;
+
+
+3
+Write a solution using a recursive CTE that returns the management chain leading to Zoya Dolgopyatova (employee ID 9).
+■■ Tables involved: HR.Employees
+■■ Desired output:
+       empid       mgrid       firstname  lastname
+       ----------- ----------- ---------- --------------------
+       9           5           Zoya       Dolgopyatova
+       5           2           Sven       Buck
+       2           1           Don        Funk
+       1           NULL        Sara       Davis
+WITH EmpsCTE AS 
+(
+    -- anchor member 
+    SELECT empid, mgrid, firstname, lastname 
+    FROM HR.Employees 
+    WHERE empid = 9
+
+    UNION ALL 
+
+    -- recursive member
+    SELECT E.empid, E.mgrid, E.firstname, E.lastname 
+    FROM HR.Employees AS E 
+        INNER JOIN EmpsCTE 
+        ON E.empid = EmpsCTE.mgrid 
+)
+
+SELECT empid, mgrid, firstname, lastname 
+FROM EmpsCTE;
+
+
+
+4-1
+Create a view that returns the total quantity for each employee and year.
+CREATE VIEW Sales.VEmpOrders 
+AS SELECT empid, YEAR(orderdate) AS orderyear, SUM(qty) AS qty 
+FROM Sales.Orders AS SO 
+    INNER JOIN Sales.OrderDetails AS SOD 
+    ON SO.orderid = SOD.orderid 
+GROUP BY empid, YEAR(orderdate);
+
+
+4 - 2
+Write a query against Sales.VEmpOrders that returns the running total quantity for each employee and year.
+
+SELECT OuterVO.empid, OuterVO.orderyear, OuterVO.qty, 
+    (SELECT SUM(InnerVO.qty) 
+    FROM Sales.VEmpOrders AS InnerVO
+    WHERE InnerVO.orderyear <= OuterVO.orderyear AND InnerVO.empid = OuterVO.empid
+    ) AS runqty
+FROM Sales.VEmpOrders AS OuterVO
+ORDER BY empid, orderyear;
+
+
+5 - 1
+Create an inline function that accepts as inputs a supplier ID (@supid AS INT) and a requested num- ber of products (@n AS INT). The function should return @n products with the highest unit prices that are supplied by the specified supplier ID.
+IF OBJECT_ID('Production.TopProducts') IS NOT NULL 
+    DROP FUNCTION Production.TopProducts;
+GO
+CREATE FUNCTION Production.TopProducts(@supid AS INT, @n AS INT)
+RETURNS TABLE 
+AS 
+RETURN 
+    SELECT productid, productname, unitprice 
+    FROM Production.Products 
+    WHERE supplierid = @supid 
+    ORDER BY unitprice DESC
+    OFFSET 0 ROWS FETCH FIRST @n ROWS ONLY;
+GO
+SELECT * FROM Production.TopProducts(5, 2);
+
+
+5-2
+Using the CROSS APPLY operator and the function you created in Exercise 4-1, return, for each sup- plier, the two most expensive products.
+SELECT PS.supplierid, PS.companyname, PTP.productid, PTP.productname, PTP.unitprice
+FROM Production.Suppliers AS PS
+    CROSS APPLY Production.TopProducts(PS.supplierid, 2) AS PTP;

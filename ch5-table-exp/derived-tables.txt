@@ -1,0 +1,46 @@
+// derived table 
+// A derived table is a subquery used in the FROM clause 
+
+SELECT * 
+FROM (SELECT custid, companyname 
+    FROM Sales.Customers
+    WHERE country = 'USA') AS USACusts;
+
+
+SELECT orderyear, COUNT(DISTINCT custid) AS numcusts
+FROM (
+    SELECT YEAR(orderdate) AS orderyear, custid
+    FROM Sales.Orders
+    ) AS Orders
+GROUP BY orderyear;
+
+
+// external form 
+SELECT y, COUNT(DISTINCT c) AS numcusts
+FROM (
+    SELECT YEAR(orderdate), custid
+    FROM Sales.Orders
+    ) AS Orders(y, c)
+GROUP BY y;
+
+
+// using arguments 
+DECLARE @empid AS INT =  3;
+
+SELECT orderyear, COUNT(DISTINCT custid) AS numcasts 
+FROM (SELECT YEAR(orderdate) AS orderyear, custid 
+    FROM Sales.Orders WHERE empid = @empid) AS D 
+GROUP BY orderyear; 
+
+
+// nesting 
+SELECT D2.orderyear, D2.numcusts 
+FROM (
+    SELECT D1.orderyear, COUNT(DISTINCT D1.custid) AS numcusts
+    FROM (
+        SELECT YEAR(orderdate) AS orderyear, custid 
+        FROM Sales.Orders
+        ) AS D1
+    GROUP BY D1.orderyear 
+    ) AS D2 
+WHERE numcusts > 70;

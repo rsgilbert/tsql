@@ -1,0 +1,25 @@
+// Inline table valued functions
+// these are parameterized views 
+// or 
+// table expressions that support input parameters
+
+CREATE FUNCTION dbo.GetCustOrders 
+    (@cid AS INT) RETURNS TABLE 
+AS 
+RETURN 
+    SELECT orderid, custid, empid, orderdate 
+    FROM Sales.Orders 
+    WHERE custid = @cid; 
+
+// using a tvf 
+SELECT O.orderid, O.custid, O.orderdate
+FROM dbo.GetCustOrders(2) AS O; 
+
+
+SELECT O.orderid, O.custid, O.orderdate, OD.productid, OD.qty
+FROM dbo.GetCustOrders(2) AS O
+    INNER JOIN Sales.OrderDetails AS OD 
+    ON O.orderid = OD.orderid;
+
+
+

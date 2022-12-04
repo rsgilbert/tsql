@@ -1,0 +1,67 @@
+// common table expressions 
+
+// inline form 
+WITH UKCusts AS 
+(
+    SELECT custid, companyname 
+    FROM Sales.Customers 
+    WHERE country = 'UK'
+)
+SELECT * FROM UKCusts;
+
+// external form 
+WITH drivernames(n) AS (SELECT name FROM drivers) SELECT * FROM drivernames;
+
+ // multiple CTEs 
+ WITH C1 AS 
+(
+    SELECT YEAR(orderdate) AS orderyear, custid 
+    FROM Sales.Orders
+),
+C2 AS 
+(
+    SELECT orderyear, COUNT(DISTINCT custid) AS numcusts 
+    FROM C1 
+    GROUP BY orderyear 
+)
+SELECT orderyear, numcusts 
+FROM C2 
+WHERE numcusts > 70; 
+
+
+
+// multiple references of CTEs 
+WITH YearlyCount AS 
+(
+    SELECT YEAR(orderdate) AS orderyear,
+        COUNT(DISTINCT custid) AS numcusts 
+    FROM Sales.Orders 
+    GROUP BY YEAR(orderdate)
+)
+SELECT Curr.orderyear, 
+    Curr.numcusts AS currnumcusts,
+    Prv.numcusts AS prvnumcusts 
+FROM YearlyCount AS Curr 
+    LEFT OUTER JOIN YearlyCount AS Prv 
+    ON Curr.orderyear = Prv.orderyear + 1 
+
+
+
+
+// union 
+WITH EmpsCTE AS 
+(
+    SELECT empid, mgrid, firstname,lastname 
+    FROM HR.Employees 
+    WHERE empid = 2 
+
+    UNION ALL 
+
+    SELECT empid, mgrid, firstname,lastname 
+    FROM HR.Employees 
+    WHERE empid = 3
+)
+SELECT empid, mgrid, firstname, lastname 
+FROM EmpsCTE
+ORDER BY empid;
+

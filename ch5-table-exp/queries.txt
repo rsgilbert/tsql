@@ -1,0 +1,84 @@
+// create a view 
+
+CREATE VIEW Sales.GermanyCusts 
+AS 
+SELECT * 
+FROM Sales.Customers 
+WHERE country = 'Germany';
+
+// query a view 
+SELECT * FROM Sales.GermanyCusts;
+
+// refresh view 
+sp_refreshview 'Sales.GermanyCusts'; 
+
+// alter a view 
+ALTER VIEW Sales.GermanyCusts 
+AS 
+SELECT TOP(100) PERCENT custid, companyname 
+FROM Sales.Customers 
+WHERE country = 'Germany'; 
+
+
+ALTER VIEW Sales.GermanyCusts 
+AS 
+SELECT custid, companyname 
+FROM Sales.Customers 
+WHERE country = 'Germany'
+ORDER BY companyname
+OFFSET 0 ROWS;
+
+
+// Get the definition of a view 
+SELECT OBJECT_DEFINITION(OBJECT_ID('Sales.GermanyCusts'))
+// or 
+EXEC sp_helptext 'Sales.GermanyCusts'
+
+
+// encrypt the definition of a view 
+ALTER VIEW Sales.GermanyCusts WITH ENCRYPTION
+AS 
+SELECT * 
+FROM Sales.Customers 
+WHERE country = 'Germany';
+
+// schema binding 
+ALTER VIEW Sales.GermanyCusts WITH SCHEMABINDING
+AS 
+SELECT custid, companyname
+FROM Sales.Customers 
+WHERE country = 'Germany';
+
+// insert through view 
+// define appropriate view 
+ALTER VIEW Sales.GermanyCusts 
+AS 
+SELECT companyname, contactname, contacttitle, address,
+  city, region, postalcode, country, phone, fax
+FROM Sales.Customers 
+WHERE country = 'Germany';
+
+//insert data 
+INSERT INTO Sales.GermanyCusts(
+  companyname, contactname, contacttitle, address,
+  city, region, postalcode, country, phone, fax)
+ VALUES(
+  N'Customer XYZ', N'Contact XYZ', N'Title ABCDE', N'Address ABCDE',
+  N'London', NULL, N'12345', N'Germany', N'012-3456789', N'012-3456789');
+
+// prevent modifications that conflict with the view's filter 
+ALTER VIEW Sales.GermanyCusts 
+AS 
+SELECT companyname, contactname, contacttitle, address,
+  city, region, postalcode, country, phone, fax
+FROM Sales.Customers 
+WHERE country = 'Germany'
+WITH CHECK OPTION;
+
+
+// delete a view 
+DROP VIEW Sales.GermanyCusts;
+
+
+
+

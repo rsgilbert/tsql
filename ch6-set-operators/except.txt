@@ -1,0 +1,20 @@
+// returns rows in SET A but do not appear in SET B 
+SELECT country, region, city FROM HR.Employees
+EXCEPT 
+SELECT country, region, city FROM Sales.Customers;  
+
+
+// except all 
+WITH except_cte
+AS 
+(
+    SELECT country, city,
+        ROW_NUMBER() OVER (PARTITION BY country, city ORDER BY (SELECT 0)) AS rownum
+    FROM HR.Employees
+    EXCEPT
+    SELECT  country, city,
+        ROW_NUMBER() OVER (PARTITION BY country, city ORDER BY (SELECT 0)) AS rownum
+    FROM Sales.Customers
+)
+SELECT * FROM except_cte;
+

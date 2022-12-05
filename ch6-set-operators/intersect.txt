@@ -1,0 +1,39 @@
+// INTERSECT eliminates duplicate rows from two input 
+// multisets
+SELECT country, region, city FROM HR.Employees
+INTERSECT
+SELECT country, region, city FROM Sales.Customers;
+
+
+// intersect all
+SELECT 
+    ROW_NUMBER() OVER (PARTITION BY country, region, city ORDER BY (SELECT 0)),
+    country,region,city 
+FROM HR.Employees  
+
+INTERSECT
+
+SELECT 
+    ROW_NUMBER() OVER (PARTITION BY country, region, city ORDER BY (SELECT 0)),
+    country,region,city 
+FROM Sales.Customers; 
+
+
+// use CTE to exclude rownum column
+
+WITH all_rows_cte AS 
+(
+    SELECT 
+        ROW_NUMBER() OVER (PARTITION BY country, region, city ORDER BY (SELECT 0)) AS rownum,
+        country,region,city 
+    FROM HR.Employees  
+
+    INTERSECT
+
+    SELECT 
+        ROW_NUMBER() OVER (PARTITION BY country, region, city ORDER BY (SELECT 0)) AS rownum,
+        country,region,city 
+    FROM Sales.Customers
+)
+SELECT country, region, city
+FROM all_rows_cte;

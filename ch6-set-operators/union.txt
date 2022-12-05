@@ -1,0 +1,48 @@
+// unify results using UNION ALL 
+SELECT country, region, city FROM HR.Employees
+UNION ALL
+SELECT country, region, city FROM Sales.Customers;
+
+// remove duplicates with UNION (implicit DISTINCT)
+SELECT country, region  FROM HR.Employees
+UNION 
+SELECT country, region FROM Sales.Customers; 
+
+// select top 2 rows for employees 3 and 5 
+SELECT empid, orderid, orderdate 
+FROM 
+    (
+        SELECT empid, orderid, orderdate 
+        FROM Sales.Orders 
+        WHERE empid = 3 
+        ORDER BY orderdate DESC, orderid DESC
+        OFFSET 0 ROWS FETCH NEXT 2 ROWS ONLY
+    ) AS D1 
+UNION 
+SELECT empid, orderid, orderdate 
+FROM
+    (SELECT empid, orderid, orderdate 
+    FROM Sales.Orders 
+    WHERE empid = 5
+    ORDER BY orderdate DESC, orderid DESC
+    OFFSET 0 ROWS FETCH NEXT 2 ROWS ONLY
+    ) AS D2
+ 
+
+// use where in the set operator operands
+SELECT empid, orderid 
+FROM Sales.Orders 
+WHERE empid = 2
+UNION ALL
+SELECT TOP(5) empid, orderid 
+FROM Sales.Orders
+WHERE empid = 3
+ORDER BY empid;
+
+// apply union to the top rows 
+ SELECT TOP(3) empid, orderid 
+ FROM Sales.Orders 
+ UNION ALL
+ SELECT TOP(5) empid, orderid 
+ FROM Sales.Orders
+ ORDER BY empid;

@@ -1,0 +1,119 @@
+set operator exercises 
+
+1
+Write a query that generates a virtual auxiliary table of 10 numbers in the range 1 through 10 without using a looping construct. You do not need to guarantee any order of the rows in the output of your solution.
+
+SELECT 1 AS n 
+UNION 
+SELECT 2 
+UNION 
+SELECT 3
+UNION 
+SELECT 4
+UNION 
+SELECT 5
+UNION 
+SELECT 6
+UNION 
+SELECT 7
+UNION 
+SELECT 8
+UNION 
+SELECT 8
+UNION 
+SELECT 10;
+
+
+-- alternatively
+SELECT n 
+FROM (VALUES(1),(2), (3), (4), (5), (6), (7), (8), (9), (10)) AS MyNums(n);
+
+
+
+2
+Write a query that returns customer and employee pairs that had order activity in January 2008 but not in February 2008.
+
+SELECT custid, empid
+FROM Sales.Orders 
+WHERE YEAR(orderdate) = 2008 AND MONTH(orderdate) = 1
+EXCEPT
+SELECT custid, empid
+FROM Sales.Orders 
+WHERE YEAR(orderdate) = 2008 AND MONTH(orderdate) = 2;
+
+
+3
+Write a query that returns customer and employee pairs that had order activity in both January 2008 and February 2008.
+
+
+SELECT custid, empid
+FROM Sales.Orders 
+WHERE YEAR(orderdate) = 2008 AND MONTH(orderdate) = 1
+INTERSECT
+SELECT custid, empid
+FROM Sales.Orders 
+WHERE YEAR(orderdate) = 2008 AND MONTH(orderdate) = 2;
+
+
+
+4 
+Write a query that returns customer and employee pairs that had order activity in both January 2008 and February 2008 but not in 2007.
+
+(SELECT custid, empid
+FROM Sales.Orders 
+WHERE YEAR(orderdate) = 2008 AND MONTH(orderdate) = 1
+INTERSECT
+SELECT custid, empid
+FROM Sales.Orders 
+WHERE YEAR(orderdate) = 2008 AND MONTH(orderdate) = 2
+)
+EXCEPT
+SELECT custid, empid 
+FROM Sales.Orders
+WHERE YEAR(orderdate) = 2007;
+
+
+5 (Optional, advanced)
+You are given the following query.
+SELECT country, region, city
+FROM HR.Employees
+UNION ALL
+SELECT country, region, city
+FROM Production.Suppliers;
+
+You are asked to add logic to the query so that it guarantees that the rows from Employees are returned in the output before the rows from Suppliers. Also, within each segment, the rows should be sorted by country, region, and city.
+
+SELECT country, region, city 
+FROM 
+    (SELECT * 
+    FROM HR.Employees 
+    ORDER BY country, region, city 
+    OFFSET 0 ROWS
+    ) AS R
+UNION ALL 
+SELECT country, region, city 
+FROM 
+    (SELECT * 
+    FROM Production.Suppliers 
+    ORDER BY country, region, city 
+    OFFSET 0 ROWS) 
+    AS R
+
+
+
+// or 
+
+SELECT country, region, city FROM 
+(
+    SELECT 0 AS sortcol, country, region, city 
+    FROM HR.Employees
+    UNION ALL 
+    SELECT 1 AS sortcol, country, region, city 
+    FROM Production.Suppliers
+) AS D
+ORDER BY sortcol, country, region, city;
+
+
+
+
+

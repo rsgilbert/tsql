@@ -1,0 +1,6 @@
+// INTERSECT has precedes UNION and EXCEPT 
+SELECT country, region, city FROM Production.Suppliers
+EXCEPT
+SELECT country, region, city FROM HR.Employees
+INSERSECT
+SELECT country, region, city FROM Sales.Customers;

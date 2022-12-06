@@ -1,0 +1,21 @@
+// LAG and LEAD 
+SELECT empid, lastname, birthdate, mgrid,
+    LAG(lastname) OVER (PARTITION BY mgrid ORDER BY birthdate) older_colleague,
+    LEAD(lastname) OVER (PARTITION BY mgrid ORDER BY birthdate) younger_colleague
+FROM HR.Employees;
+
+
+// FIRST_VALUE and LAST_VALUE 
+SELECT custid, orderid, 
+    FIRST_VALUE(orderid) OVER 
+        (PARTITION BY custid
+        ORDER BY orderdate, orderid 
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW 
+        ) AS first_orderid,
+    LAST_VALUE(orderid) OVER 
+        (PARTITION BY custid 
+        ORDER BY orderdate, orderid 
+        ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS last_orderid
+FROM Sales.Orders
+ORDER BY custid;

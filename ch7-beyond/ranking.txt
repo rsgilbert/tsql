@@ -1,0 +1,17 @@
+// ROW_NUMBER, RANK, DENSE_RANK, NTILE 
+SELECT orderid, custid, val,
+    ROW_NUMBER() OVER(ORDER BY val) AS rownum,
+    RANK() OVER(ORDER BY val) AS rank,
+    DENSE_RANK() OVER(ORDER BY val) AS dense_rank,
+    NTILE(500) OVER(ORDER BY val) AS ntile
+FROM Sales.OrderValues 
+ORDER BY val; 
+
+// rank partitions
+SELECT orderid, qty,
+    ROW_NUMBER() OVER(PARTITION BY orderid ORDER BY qty) AS rownum,
+    RANK() OVER(PARTITION BY orderid ORDER BY qty) AS rank,
+    DENSE_RANK() OVER(PARTITION BY orderid ORDER BY qty) AS dense_rank,
+    NTILE(2) OVER(PARTITION BY orderid ORDER BY qty) AS ntile
+FROM Sales.OrderDetails 
+ORDER BY orderid;

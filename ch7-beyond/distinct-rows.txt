@@ -1,0 +1,9 @@
+// if there is ROW_NUMBER, the rows are all unique 
+// below wont work
+SELECT DISTINCT val, ROW_NUMBER() OVER (ORDER BY val) AS rownum 
+FROM Sales.OrderValues
+
+// this will work. We first group the data, then assign a row number for each group
+SELECT val, ROW_NUMBER() OVER (ORDER BY val) AS rownum 
+FROM Sales.OrderValues 
+GROUP BY val;

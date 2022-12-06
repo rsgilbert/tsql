@@ -1,0 +1,37 @@
+// compute running total values for each employee 
+SELECT empid, ordermonth, val, 
+    SUM(val) OVER 
+        (PARTITION by empid 
+        ORDER BY ordermonth 
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ) AS runval 
+FROM Sales.EmpOrders;
+
+// an empty OVER() clause exposes to the fn a window of all rows 
+SELECT empid, ordermonth, val, SUM(val) OVER() AS runval 
+FROM Sales.EmpOrders;
+
+SELECT orderid, qty,
+    SUM(qty) OVER() AS totalqty
+FROM Sales.OrderDetails; 
+
+// partition by restricts the rows in the window to the subset that 
+share the same values in the partitioning columns 
+SELECT orderid, qty,
+    SUM(qty) OVER(PARTITION BY orderid) AS orderqty
+FROM Sales.OrderDetails; 
+
+// ORDER BY defines ordering in the window 
+SELECT orderid, qty,
+    SUM(qty) OVER(PARTITION BY orderid ORDER BY qty) AS orderqty
+FROM Sales.OrderDetails;
+
+// after ordering has been defined, a window frame clause filters 
+// a frame of rows from the partition 
+SELECT orderid, qty,
+    SUM(qty) OVER
+        (PARTITION BY orderid 
+        ORDER BY qty 
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS runningorderqty
+FROM Sales.OrderDetails;
+
